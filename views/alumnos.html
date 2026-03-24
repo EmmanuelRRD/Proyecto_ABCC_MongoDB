@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Servicios Escolares | ABCC</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        /* Navbar con degradado profesional */
+        .navbar-custom {
+            background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+            padding: 1rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        /* Tarjeta principal */
+        .main-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .card-header {
+            background-color: white !important;
+            padding: 1.5rem !important;
+            border-bottom: 1px solid #eee !important;
+        }
+
+        /* Estilo de la tabla */
+        .table thead th {
+            background-color: #f8f9fa;
+            color: #6c757d;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: none;
+        }
+
+        .table tbody td {
+            vertical-align: middle;
+            padding: 1rem;
+        }
+
+        /* Botones redondeados */
+        .btn {
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        /* Modales con bordes suaves */
+        .modal-content {
+            border: none;
+            border-radius: 20px;
+        }
+
+        .form-control {
+            border-radius: 10px;
+            padding: 0.6rem 1rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar-custom">
+        <div class="container d-flex justify-content-between align-items-center">
+            <h4 class="text-white m-0 fw-bold"><i class="fas fa-graduation-cap me-2"></i>Control Escolar</h4>
+            <span class="text-white-50 small">Proyecto MongoDB ABCC</span>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="card main-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="m-0 fw-bold text-dark">Listado de Alumnos</h5>
+                <button type="button" class="btn btn-primary shadow-sm"
+                    onclick="makeModal('Registrar Alumno', 'Guardar Datos', 'agregarRegistro')">
+                    <i class="fas fa-plus-circle me-1"></i> Nuevo Alumno
+                </button>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th class="ps-4">N° Control</th>
+                                <th>Nombre Completo</th>
+                                <th>Carrera</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dataArea">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalArea"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        var alumnoModalElement;
+
+        // --- MOTOR DE MODALES ---
+        function makeModal(title, button_value, callback) {
+            let html = `
+            <div class="modal fade" id="alumnoModal" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content shadow-lg">
+                        <form id="alumnoform">
+                            <div class="modal-header border-0">
+                                <h5 class="modal-title fw-bold text-primary">${title}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body pt-0">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label small">N° Control</label>
+                                        <input type="text" name="numControl" id="numControl" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small">Semestre</label>
+                                        <input type="number" name="semestre" id="semestre" class="form-control">
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label small">Nombre completo</label>
+                                        <input type="text" name="nombre" id="nombre" class="form-control">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small">Primer Apellido</label>
+                                        <input type="text" name="primerAp" id="primerAp" class="form-control">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small">Segundo Apellido</label>
+                                        <input type="text" name="segundoAp" id="segundoAp" class="form-control">
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label small">Carrera</label>
+                                        <input type="text" name="carrera" id="carrera" class="form-control">
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label small">Fecha de Nacimiento</label>
+                                        <input type="date" name="fechaNac" id="fechaNac" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer border-0">
+                                <input type="hidden" name="alumno_id" id="alumno_id" />
+                                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cerrar</button>
+                                ${button_value !== '' ? `<button type="button" class="btn btn-primary px-4" onclick="${callback}()">${button_value}</button>` : ''}
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>`;
+
+            document.getElementById('modalArea').innerHTML = html;
+            
+            // Configurar si es solo lectura (Detalles)
+            const inputs = document.querySelectorAll('#alumnoform input');
+            if (button_value === '') {
+                inputs.forEach(input => input.readOnly = true);
+            }
+
+            alumnoModalElement = new bootstrap.Modal(document.getElementById('alumnoModal'));
+            alumnoModalElement.show();
+        }
+
+        // --- CRUD LOGIC ---
+
+        function mostrarRegistros() {
+            fetch('/alumnos')
+                .then(res => res.json())
+                .then(data => {
+                    let html = '';
+                    if (data.length > 0) {
+                        data.forEach(row => {
+                            html += `
+                            <tr>
+                                <td class="ps-4 fw-bold text-primary">${row.numControl}</td>
+                                <td>${row.nombre} ${row.primerAp} ${row.segundoAp}</td>
+                                <td><span class="badge bg-soft-primary text-primary" style="background-color: #e7f1ff;">${row.carrera}</span></td>
+                                <td class="text-center">
+                                    <div class="btn-group">
+                                        <button class="btn btn-outline-info btn-sm mx-1" onclick="verDetalles('${row._id}')"><i class="fas fa-eye"></i></button>
+                                        <button class="btn btn-outline-warning btn-sm mx-1" onclick="detalle('${row._id}')"><i class="fas fa-edit"></i></button>
+                                        <button class="btn btn-outline-danger btn-sm mx-1" onclick="eliminar('${row._id}')"><i class="fas fa-trash"></i></button>
+                                    </div>
+                                </td>
+                            </tr>`;
+                        });
+                    } else {
+                        html = '<tr><td colspan="4" class="text-center py-5 text-muted">No hay datos disponibles</td></tr>';
+                    }
+                    document.getElementById('dataArea').innerHTML = html;
+                });
+        }
+
+        function agregarRegistro() {
+            const formData = new FormData(document.getElementById('alumnoform'));
+            const jsonData = Object.fromEntries(formData);
+
+            fetch('/alumnos', {
+                method: 'POST',
+                body: JSON.stringify(jsonData),
+                headers: { 'Content-Type': 'application/json' }
+            }).then(() => {
+                alumnoModalElement.hide();
+                mostrarRegistros();
+            });
+        }
+
+        function detalle(id) {
+            fetch(`/alumnos/${id}`).then(res => res.json()).then(data => {
+                makeModal('Actualizar Información', 'Guardar Cambios', 'modificar');
+                document.getElementById('numControl').value = data.numControl;
+                document.getElementById('nombre').value = data.nombre;
+                document.getElementById('primerAp').value = data.primerAp;
+                document.getElementById('segundoAp').value = data.segundoAp;
+                document.getElementById('fechaNac').value = (data.fechaNac || data.fechaNa)?.split('T')[0];
+                document.getElementById('semestre').value = data.semestre;
+                document.getElementById('carrera').value = data.carrera;
+                document.getElementById('alumno_id').value = data._id;
+            });
+        }
+
+        function verDetalles(id) {
+            fetch(`/alumnos/${id}`).then(res => res.json()).then(data => {
+                makeModal('Ficha del Alumno', '', '');
+                document.getElementById('numControl').value = data.numControl;
+                document.getElementById('nombre').value = data.nombre;
+                document.getElementById('primerAp').value = data.primerAp;
+                document.getElementById('segundoAp').value = data.segundoAp;
+                document.getElementById('fechaNac').value = (data.fechaNac || data.fechaNa)?.split('T')[0];
+                document.getElementById('semestre').value = data.semestre;
+                document.getElementById('carrera').value = data.carrera;
+            });
+        }
+
+        function modificar() {
+            const id = document.getElementById('alumno_id').value;
+            const jsonData = Object.fromEntries(new FormData(document.getElementById('alumnoform')));
+            fetch(`/alumnos/${id}`, {
+                method: 'PUT',
+                body: JSON.stringify(jsonData),
+                headers: { 'Content-Type': 'application/json' }
+            }).then(() => {
+                alumnoModalElement.hide();
+                mostrarRegistros();
+            });
+        }
+
+        function eliminar(id) {
+            if (confirm("¿Eliminar este alumno del sistema?")) {
+                fetch(`/alumnos/${id}`, { method: 'DELETE' }).then(() => mostrarRegistros());
+            }
+        }
+
+        // Carga inicial
+        mostrarRegistros();
+    </script>
+</body>
+
+</html>
